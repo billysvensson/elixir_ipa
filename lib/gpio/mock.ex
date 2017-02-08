@@ -39,11 +39,15 @@ defmodule Gpio.Mock do
     {:ok, state}
   end
 
-  def handle_call(:read, _from, %State{direction: :input, value: value} = state) do
+  def handle_call(:read, _from, %State{value: value} = state) do
     {:reply, {:ok, value}, state}
   end
   def handle_call({:write, value}, _from, %State{direction: :output} = state) do
     trigger_interrupt(value, state)
+    state = %State{state | value: value}
+    {:reply, :ok, state}
+  end
+  def handle_call({:write, value}, _from, %State{direction: :input} = state) do
     state = %State{state | value: value}
     {:reply, :ok, state}
   end
